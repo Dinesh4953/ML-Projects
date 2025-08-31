@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 from src.components.data_transformation import DataTransformation, DataTransformationCongif
+from src.components.model_trainer import ModelTrainer, ModelTrainerConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -28,6 +29,15 @@ class DataIngestion:
             
             df.to_csv(self.ingestion_config.raw_data_path, index=False, header=True)
             logger.info("Train test split initialised")
+            # os.makedirs(..., exist_ok=True) 
+# → Creates the directory if it doesn’t exist; exist_ok=True prevents errors if it already exists.
+
+# Saves raw dataset to a file before any processing.
+
+# index=False → Avoids saving the DataFrame index as a separate column.
+
+# header=True → Includes column names in the CSV.
+
             
             train_set, test_set = train_test_split(df, test_size=0.2, random_state=42)
             
@@ -44,11 +54,14 @@ class DataIngestion:
 
 if __name__ == "__main__":
     obj = DataIngestion()
+    obj.initiate_data_ingestion()
     train_data, test_data = obj.initiate_data_ingestion()
     
     data_transformation = DataTransformation()
-    data_transformation.initiate_data_transformation(train_data, test_data)
-
+    train_arr, test_arr, _ = data_transformation.initiate_data_transformation(train_data, test_data)
+    modelTrainer = ModelTrainer()
+    r2 = modelTrainer.initiate_model_trainer(train_arr, test_arr)
+    print(r2)
 
 
 
